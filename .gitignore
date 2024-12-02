@@ -39,3 +39,4 @@ bin/
 
 ### Input .txts ###
 **/src/Main/resources/*
+/AOC2024/.idea
