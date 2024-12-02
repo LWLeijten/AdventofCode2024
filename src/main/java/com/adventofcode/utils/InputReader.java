@@ -1,6 +1,5 @@
 package com.adventofcode.utils;
 
-import com.adventofcode.solutions.Day01;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
