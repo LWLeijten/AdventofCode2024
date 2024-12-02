@@ -9,40 +9,40 @@ import java.util.List;
 public class Day02 {
   public Day02() throws URISyntaxException, FileNotFoundException {
     List<List<Long>> reports = InputReader.readAsLongMatrix("/day02.txt");
-    System.out.println(reports.stream().filter(this::checkSubReport).toList().size());
-    System.out.println(reports.stream().filter(this::reportIsSafe).toList().size());
+    System.out.printf("Part one: %s%n", reports.stream().filter(this::checkReport).toList().size());
+    System.out.printf(
+        "Part two: %s%n", reports.stream().filter(this::checkDampenedReport).toList().size());
   }
 
-  private boolean reportIsSafe(List<Long> report) {
-    boolean safe = checkSubReport(report);
+  private boolean checkDampenedReport(List<Long> report) {
+    boolean safe = checkReport(report);
     if (safe) {
       return true;
     } else {
-      List<List<Long>> subreports = new ArrayList<>();
+      List<List<Long>> subReports = new ArrayList<>();
       for (int i = 0; i < report.size(); i++) {
         List<Long> newReport = new ArrayList<>(report);
         newReport.remove(i);
-        subreports.add(newReport);
+        subReports.add(newReport);
       }
-      return subreports.stream().anyMatch(this::checkSubReport);
+      return subReports.stream().anyMatch(this::checkReport);
     }
   }
 
-  private boolean checkSubReport(List<Long> report) {
+  private boolean checkReport(List<Long> report) {
     boolean ascending = false;
     boolean descending = false;
-    boolean invalidGap = false;
     for (int i = 0; i < report.size() - 1; i++) {
       long diff = report.get(i) - report.get(i + 1);
       if (diff < 0) {
         ascending = true;
-      } else if (diff > 0 ) {
+      } else if (diff > 0) {
         descending = true;
       }
-      if (Math.abs(diff) == 0 || Math.abs(diff) > 3) {
-        invalidGap = true;
+      if (ascending && descending || (diff == 0 || Math.abs(diff) > 3)) {
+        return false;
       }
     }
-    return !(ascending && descending) && !invalidGap;
+    return true;
   }
 }
