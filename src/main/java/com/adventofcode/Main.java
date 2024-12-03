@@ -2,6 +2,7 @@ package com.adventofcode;
 
 import com.adventofcode.solutions.Day01;
 import com.adventofcode.solutions.Day02;
+import com.adventofcode.solutions.Day03;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 
@@ -11,5 +12,7 @@ public class Main {
     new Day01();
     System.out.println("################################ Day 02 ################################");
     new Day02();
+    System.out.println("################################ Day 03 ################################");
+    new Day03();
   }
 }

@@ -31,4 +31,12 @@ public class InputReader {
             .map(Long::parseLong).toList())
         .toList();
   }
+
+  public static String readAsString(String filePath)
+      throws FileNotFoundException, URISyntaxException {
+    URL is = InputReader.class.getResource(filePath);
+    File file = new File(is.toURI());
+    List<String> list = new ArrayList<>();
+    return new Scanner(file).useDelimiter("\\Z").next();
+  }
 }
