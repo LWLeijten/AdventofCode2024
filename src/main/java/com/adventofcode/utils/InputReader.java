@@ -36,7 +36,6 @@ public class InputReader {
       throws FileNotFoundException, URISyntaxException {
     URL is = InputReader.class.getResource(filePath);
     File file = new File(is.toURI());
-    List<String> list = new ArrayList<>();
     return new Scanner(file).useDelimiter("\\Z").next();
   }
 }
