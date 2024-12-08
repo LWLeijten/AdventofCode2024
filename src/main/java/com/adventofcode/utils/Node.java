@@ -13,4 +13,8 @@ public class Node<T> {
     this.value = value;
     this.children = children;
   }
+
+  public boolean isLeaf() {
+    return children.isEmpty();
+  }
 }

@@ -1,5 +1,7 @@
 package com.adventofcode.solutions;
 
+import static com.adventofcode.utils.BiFunctions.*;
+
 import com.adventofcode.utils.InputReader;
 import com.adventofcode.utils.Node;
 import java.io.FileNotFoundException;
@@ -8,9 +10,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 public class Day07 {
-  BiFunction<Long, Long, Long> add = Long::sum;
-  BiFunction<Long, Long, Long> multiply = (a, b) -> a * b;
-  BiFunction<Long, Long, Long> concat = (a, b) -> Long.parseLong(a.toString().concat(b.toString()));
 
   public Day07() throws FileNotFoundException, URISyntaxException {
     List<String> input = InputReader.readInput("/day07.txt");
@@ -37,7 +36,7 @@ public class Day07 {
     queue.offer(start);
     while (!queue.isEmpty()) {
       Node<Long> curr = queue.remove();
-      if (curr.getChildren().isEmpty() && curr.getValue().equals(value)) {
+      if (curr.isLeaf() && curr.getValue().equals(value)) {
         return true;
       }
       queue.addAll(curr.getChildren());

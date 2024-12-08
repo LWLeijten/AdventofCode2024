@@ -14,12 +14,10 @@ public class Day08 {
     List<String> input = InputReader.readInput("/day08.txt");
     int height = input.size();
     int width = input.get(0).length();
-
     HashMap<Character, List<Tuple<Integer>>> antennas = createAntennaMap(height, input, width);
-    HashSet<Tuple<Integer>> antinodes = getAntinodes(antennas, width, height, true);
-    System.out.println(antinodes.size());
-    HashSet<Tuple<Integer>> antinodes2 = getAntinodes(antennas, width, height, false);
-    System.out.println(antinodes2.size());
+
+    System.out.printf("Part one: %s%n", getAntiNodes(antennas, width, height, true).size());
+    System.out.printf("Part two: %s%n", getAntiNodes(antennas, width, height, false).size());
   }
 
   private HashMap<Character, List<Tuple<Integer>>> createAntennaMap(
@@ -41,9 +39,9 @@ public class Day08 {
     return antennas;
   }
 
-  private HashSet<Tuple<Integer>> getAntinodes(
+  private HashSet<Tuple<Integer>> getAntiNodes(
       HashMap<Character, List<Tuple<Integer>>> antennas, int width, int height, boolean single) {
-    HashSet<Tuple<Integer>> antinodes = new HashSet<>();
+    HashSet<Tuple<Integer>> antiNodes = new HashSet<>();
     for (List<Tuple<Integer>> frequencies : antennas.values()) {
       for (int i = 0; i < frequencies.size() - 1; i++) {
         Tuple<Integer> antennaA = frequencies.get(i);
@@ -70,11 +68,11 @@ public class Day08 {
               positive = new Tuple<>(positive.elem1() + dX, positive.elem2() + dY);
             }
           }
-          antis.stream().filter(a -> coordinateInBounds(width, height, a)).forEach(antinodes::add);
+          antis.stream().filter(a -> coordinateInBounds(width, height, a)).forEach(antiNodes::add);
         }
       }
     }
-    return antinodes;
+    return antiNodes;
   }
 
   private boolean coordinateInBounds(int width, int height, Tuple<Integer> coord) {
