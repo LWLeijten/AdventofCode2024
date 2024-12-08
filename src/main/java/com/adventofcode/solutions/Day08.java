@@ -12,11 +12,19 @@ import java.util.List;
 public class Day08 {
   public Day08() throws FileNotFoundException, URISyntaxException {
     List<String> input = InputReader.readInput("/day08.txt");
-    HashMap<Character, List<Tuple<Integer>>> antennas = new HashMap<>();
     int height = input.size();
     int width = input.get(0).length();
 
-    // Create map of antennas
+    HashMap<Character, List<Tuple<Integer>>> antennas = createAntennaMap(height, input, width);
+    HashSet<Tuple<Integer>> antinodes = getAntinodes(antennas, width, height, true);
+    System.out.println(antinodes.size());
+    HashSet<Tuple<Integer>> antinodes2 = getAntinodes(antennas, width, height, false);
+    System.out.println(antinodes2.size());
+  }
+
+  private HashMap<Character, List<Tuple<Integer>>> createAntennaMap(
+      int height, List<String> input, int width) {
+    HashMap<Character, List<Tuple<Integer>>> antennas = new HashMap<>();
     for (int y = 0; y < height; y++) {
       String row = input.get(y);
       for (int x = 0; x < width; x++) {
@@ -30,13 +38,11 @@ public class Day08 {
         }
       }
     }
-
-    HashSet<Tuple<Integer>> antinodes = getAntinodes(antennas, width, height);
-    System.out.println(antinodes.size());
-    //antinodes.forEach(a -> System.out.println(a));
+    return antennas;
   }
 
-  private HashSet<Tuple<Integer>> getAntinodes(HashMap<Character, List<Tuple<Integer>>> antennas, int width, int height) {
+  private HashSet<Tuple<Integer>> getAntinodes(
+      HashMap<Character, List<Tuple<Integer>>> antennas, int width, int height, boolean single) {
     HashSet<Tuple<Integer>> antinodes = new HashSet<>();
     for (List<Tuple<Integer>> frequencies : antennas.values()) {
       for (int i = 0; i < frequencies.size() - 1; i++) {
@@ -45,18 +51,36 @@ public class Day08 {
           Tuple<Integer> antennaB = frequencies.get(j);
           int dX = antennaB.elem1() - antennaA.elem1();
           int dY = antennaB.elem2() - antennaA.elem2();
-          List<Tuple<Integer>> antis =
-                  List.of(
-                          new Tuple<>(antennaA.elem1() - dX, antennaA.elem2() - dY),
-                          new Tuple<>(antennaB.elem1() + dX, antennaB.elem2() + dY));
-          antis.forEach(a -> {
-            if (a.elem1() >= 0 && a.elem1() < width && a.elem2() >= 0 && a.elem2() < height) {
-              antinodes.add(a);
+          List<Tuple<Integer>> antis;
+          if (single) {
+            antis =
+                List.of(
+                    new Tuple<>(antennaA.elem1() - dX, antennaA.elem2() - dY),
+                    new Tuple<>(antennaB.elem1() + dX, antennaB.elem2() + dY));
+          } else {
+            antis = new ArrayList<>();
+            Tuple<Integer> negative = new Tuple<>(antennaB.elem1() - dX, antennaB.elem2() - dY);
+            while (coordinateInBounds(width, height, negative)) {
+              antis.add(negative);
+              negative = new Tuple<>(negative.elem1() - dX, negative.elem2() - dY);
             }
-          });
+            Tuple<Integer> positive = new Tuple<>(antennaA.elem1() + dX, antennaA.elem2() + dY);
+            while (coordinateInBounds(width, height, positive)) {
+              antis.add(positive);
+              positive = new Tuple<>(positive.elem1() + dX, positive.elem2() + dY);
+            }
+          }
+          antis.stream().filter(a -> coordinateInBounds(width, height, a)).forEach(antinodes::add);
         }
       }
     }
     return antinodes;
+  }
+
+  private boolean coordinateInBounds(int width, int height, Tuple<Integer> coord) {
+    return coord.elem1() >= 0
+        && coord.elem1() < width
+        && coord.elem2() >= 0
+        && coord.elem2() < height;
   }
 }
