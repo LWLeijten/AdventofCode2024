@@ -10,13 +10,10 @@ import java.util.Objects;
 public class Day09 {
   public Day09() throws FileNotFoundException, URISyntaxException {
     String input = InputReader.readAsString("/day09.txt");
-    //List<Block> blocks = getBlocks(input);
     List<Block> compactedBlocks = compactBlocks(getBlocks(input));
     List<Block> compactedFiles = compactFiles(getBlocks(input));
     System.out.printf("Part one: %s%n", calculateChecksum(compactedBlocks));
-    //6326952718319 Too high
     System.out.printf("Part two: %s%n", calculateChecksum(compactedFiles));
-    //System.out.printf("Part two: %s%n", calculateChecksum(compactedFiles));
   }
 
   private static long calculateChecksum(List<Block> compactedBlocks) {
@@ -37,17 +34,17 @@ public class Day09 {
             .map(b -> b.fileId() != null ? b.fileId() : -1L)
             .max(Long::compare)
             .get();
-    while (curFile > 0) {
+    while (curFile >= 0) {
       int end = compactedBlocks.stream().map(Block::fileId).toList().lastIndexOf(curFile);
       int start = end;
-      while (start >= 0 && Objects.equals(compactedBlocks.get(start).fileId(), curFile)) {
+      while (start > 0 && Objects.equals(compactedBlocks.get(start).fileId(), curFile)) {
         start--;
       }
       start++;
       int fileSize = (end - start) + 1;
       int curGapStart = -1;
       int curGapSize = 0;
-      for (int i = 0; i < start; i++) {
+      for (int i = 0; i <= start; i++) {
         if (curGapSize == fileSize) {
           for (int j = curGapStart; j < curGapStart + curGapSize; j++) {
             compactedBlocks.set(j, new Block(curFile));
