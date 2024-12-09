@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class Day09 {
   public Day09() throws FileNotFoundException, URISyntaxException {
@@ -17,14 +18,10 @@ public class Day09 {
   }
 
   private static long calculateChecksum(List<Block> compactedBlocks) {
-    long result = 0L;
-    for (int i = 0; i < compactedBlocks.size(); i++) {
-      Long value = compactedBlocks.get(i).fileId();
-      if (value != null) {
-        result += i * value;
-      }
-    }
-    return result;
+    return IntStream.range(0, compactedBlocks.size())
+        .filter(i -> compactedBlocks.get(i).fileId() != null)
+        .mapToLong(i -> compactedBlocks.get(i).fileId() * i)
+        .sum();
   }
 
   private List<Block> compactFiles(List<Block> blocks) {
@@ -37,10 +34,9 @@ public class Day09 {
     while (curFile >= 0) {
       int end = compactedBlocks.stream().map(Block::fileId).toList().lastIndexOf(curFile);
       int start = end;
-      while (start > 0 && Objects.equals(compactedBlocks.get(start).fileId(), curFile)) {
+      while (start > 0 && Objects.equals(compactedBlocks.get(start - 1).fileId(), curFile)) {
         start--;
       }
-      start++;
       int fileSize = (end - start) + 1;
       int curGapStart = -1;
       int curGapSize = 0;
@@ -111,6 +107,4 @@ public class Day09 {
   }
 }
 
-record Block(Long fileId) {
-
-}
+record Block(Long fileId) {}
