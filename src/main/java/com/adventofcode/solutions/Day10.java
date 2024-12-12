@@ -2,6 +2,7 @@ package com.adventofcode.solutions;
 
 import com.adventofcode.utils.InputReader;
 import com.adventofcode.utils.Tuple;
+import com.adventofcode.utils.TupleUtils;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -37,10 +38,10 @@ public class Day10 {
           trails.put(startingPoint, trails.get(startingPoint) + 1);
           continue;
         }
-        List<Tuple<Integer>> neighbours = getNeighbours(currentPoint);
+        List<Tuple<Integer>> neighbours = TupleUtils.getNeighbours(currentPoint);
         neighbours.stream()
             .filter(nb -> (!visited.contains(nb) || !trackVisits)
-                && coordinateIsInBounds(nb, map)
+                && TupleUtils.coordinateIsInBounds(nb, map.getFirst().size(), map.size())
                 && map.get(nb.elem2()).get(nb.elem1()) == currentHeight + 1)
             .forEach(nb -> {
               queue.offer(nb);
@@ -49,22 +50,6 @@ public class Day10 {
       }
     }
     return trails.values().stream().reduce(0L, Long::sum);
-  }
-
-  private boolean coordinateIsInBounds(Tuple<Integer> coord, List<List<Long>> map) {
-    return coord.elem1() >= 0
-        && coord.elem1() < map.getFirst().size()
-        && coord.elem2() >= 0
-        && coord.elem2() < map.size();
-  }
-
-  private List<Tuple<Integer>> getNeighbours(Tuple<Integer> currentPoint) {
-    return new ArrayList<>(List.of(
-        new Tuple<>(currentPoint.elem1(), currentPoint.elem2() + 1),
-        new Tuple<>(currentPoint.elem1(), currentPoint.elem2() - 1),
-        new Tuple<>(currentPoint.elem1() + 1, currentPoint.elem2()),
-        new Tuple<>(currentPoint.elem1() - 1, currentPoint.elem2())
-    ));
   }
 
   private HashSet<Tuple<Integer>> getStartingPoints(List<List<Long>> map) {
