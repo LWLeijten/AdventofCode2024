@@ -23,4 +23,22 @@ public enum Direction {
     }
     return this;
   }
+
+  public Direction getPreviousDirection() {
+    switch (this) {
+      case NORTH -> {
+        return WEST;
+      }
+      case EAST -> {
+        return NORTH;
+      }
+      case SOUTH -> {
+        return EAST;
+      }
+      case WEST -> {
+        return SOUTH;
+      }
+    }
+    return this;
+  }
 }
