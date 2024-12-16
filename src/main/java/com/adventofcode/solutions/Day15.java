@@ -5,6 +5,7 @@ import com.adventofcode.utils.Tuple;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -49,16 +50,43 @@ public class Day15 {
       }
       Tuple<Integer> newPos =
           new Tuple<>(robot.elem1() + delta.elem1(), robot.elem2() + delta.elem2());
+      // No obstacle
       if (!walls.contains(newPos) && !boxes.contains(newPos)) {
         robot = newPos;
-      } else if (walls.contains(newPos)) {
-        continue;
-      } else if(boxes.contains(newPos)) {
-        // loop to find a free space, if there is none do nothing
-        // keep track of all boxes found, push all and the bot one when
-        // found free space
-        continue;
       }
+      // hit box
+      else if (boxes.contains(newPos)) {
+        List<Tuple<Integer>> movableBoxes = new ArrayList<>();
+        while (boxes.contains(newPos)) {
+          movableBoxes.add(newPos);
+          newPos = new Tuple<>(newPos.elem1() + delta.elem1(), newPos.elem2() + delta.elem2());
+        }
+        if (walls.contains(newPos)) {
+          continue;
+        } else {
+          robot = new Tuple<>(robot.elem1() + delta.elem1(), robot.elem2() + delta.elem2());
+          movableBoxes.forEach(boxes::remove);
+          boxes.addAll(movableBoxes.stream()
+              .map(mb -> new Tuple<>(mb.elem1() + delta.elem1(), mb.elem2() + delta.elem2()))
+              .toList());
+        }
+      }
+      // print grid
+      //      for (int y = 0; y < 8; y++) {
+      //        for (int x = 0; x < 8; x++) {
+      //          if (walls.contains(new Tuple<>(x, y))) {
+      //            System.out.print('#');
+      //          } else if (boxes.contains(new Tuple<>(x, y))) {
+      //            System.out.print('O');
+      //          } else if (robot.equals(new Tuple<>(x, y))) {
+      //            System.out.print('@');
+      //          } else {
+      //            System.out.print('.');
+      //          }
+      //        }
+      //        System.out.println();
+      //      }
     }
+    System.out.println(boxes.stream().mapToInt(b -> 100 * b.elem2() + b.elem1()).sum());
   }
 }
