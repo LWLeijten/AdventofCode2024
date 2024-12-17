@@ -85,7 +85,7 @@ public class Day16 {
             .filter(rd -> rd.position.equals(finalGoal))
             .map(distances::get)
             .toList();
-    System.out.println("Done");
+    System.out.printf("Part one: %s%n", finishes.stream().min(Long::compare).get());
   }
 
   record Reindeer(Tuple<Integer> position, Direction direction) {

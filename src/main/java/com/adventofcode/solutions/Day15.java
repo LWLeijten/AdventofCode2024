@@ -71,22 +71,7 @@ public class Day15 {
               .toList());
         }
       }
-      // print grid
-      //      for (int y = 0; y < 8; y++) {
-      //        for (int x = 0; x < 8; x++) {
-      //          if (walls.contains(new Tuple<>(x, y))) {
-      //            System.out.print('#');
-      //          } else if (boxes.contains(new Tuple<>(x, y))) {
-      //            System.out.print('O');
-      //          } else if (robot.equals(new Tuple<>(x, y))) {
-      //            System.out.print('@');
-      //          } else {
-      //            System.out.print('.');
-      //          }
-      //        }
-      //        System.out.println();
-      //      }
     }
-    System.out.println(boxes.stream().mapToInt(b -> 100 * b.elem2() + b.elem1()).sum());
+    System.out.printf("Part one: %s%n", boxes.stream().mapToInt(b -> 100 * b.elem2() + b.elem1()).sum());
   }
 }

@@ -2,8 +2,8 @@
 
 My solutions to the advent of code event 2024.
 
-| Day | Name                                    | Link                                         | Solution                                                                                                                | Stars        |
-|-----|-----------------------------------------|----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|--------------|
+| Day | Name                                    | Link                                         | Solution                                                                                                                | Stars       |
+|-----|-----------------------------------------|----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|-------------|
 | 1.  | :scroll: Historian Hysteria             | [link](https://adventofcode.com/2024/day/1)  | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day01.java) | :star::star: |
 | 2.  | :red_circle:		 Red-Nosed Reports        | [link](https://adventofcode.com/2024/day/2)  | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day02.java) | :star::star: |
 | 3.  | :heavy_multiplication_x:		 Mull It Over | [link](https://adventofcode.com/2024/day/3)  | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day03.java) | :star::star: |
@@ -18,3 +18,6 @@ My solutions to the advent of code event 2024.
 | 12. | :cherry_blossom:							 Garden Groups   | [link](https://adventofcode.com/2024/day/12) | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day12.java) | :star::star: |
 | 13. | :slot_machine:								 Claw Contraption | [link](https://adventofcode.com/2024/day/13) | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day13.java) | :star::star: |
 | 14. | :toilet:									 Restroom Redoubt      | [link](https://adventofcode.com/2024/day/14) | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day14.java) | :star::star: |
+| 15. | :package:										 Warehouse Woes      | [link](https://adventofcode.com/2024/day/15) | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day15.java) | :star: |
+| 16. | :deer:										 Reindeer Maze      | [link](https://adventofcode.com/2024/day/16) | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day16.java) | :star: |
+| 17. | :desktop_computer:										 Chronospatial Computer      | [link](https://adventofcode.com/2024/day/17) | [solution](https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/java/com/adventofcode/solutions/Day17.java) | :star: |

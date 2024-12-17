@@ -15,7 +15,6 @@ public class Day13 {
   public static final long PART_TWO_MODIFIER = 10000000000000L;
 
   public Day13() throws FileNotFoundException, URISyntaxException {
-    System.out.println("Day 13");
     List<String> input = InputReader.readInput("/day13.txt");
     List<Tuple<Long>> results = new ArrayList<>();
     List<Tuple<Long>> results2 = new ArrayList<>();
