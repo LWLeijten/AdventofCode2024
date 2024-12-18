@@ -1,7 +1,6 @@
 package com.adventofcode.solutions;
 
 import com.adventofcode.utils.InputReader;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,12 +21,38 @@ public class Day17 {
 
     ChronospatialComputer computer =
         new ChronospatialComputer(program, registerA, registerB, registerC);
-    while (computer.getInstructionPointer() < computer.program.size()) {
-      computer.performNextInstruction();
-    }
+    computer.runProgram();
     System.out.printf(
         "Part one: %s%n",
         String.join(",", computer.output.stream().map(Object::toString).toList()));
+
+    List<Long> results = new ArrayList<>();
+    findSelfOutputtingPrograms(program, 0L, 0, registerB, registerC, results);
+    System.out.printf("Part two: %s%n", results.stream().min(Long::compareTo).get());
+  }
+
+  void findSelfOutputtingPrograms(List<Short> program, Long aRegister, Integer programIndex, Long registerB, Long registerC, List<Long> results) {
+    for (int i = 0; i < 8; i++) {
+      // test if the current value of aRegister + i behind it (bitshift by 3 since 3 bit numbers) adds the expected value in the program
+      // going from the back to the front
+      Long aAttempt = (aRegister << 3) + i;
+      ChronospatialComputer c = new ChronospatialComputer(program, aAttempt, registerB, registerC);
+      c.runProgram();
+
+      // Dead end, try next number
+      if (!c.output.equals(program.subList(program.size() - programIndex - 1, program.size()))) {
+        continue;
+      }
+
+      // End case, output is the  same as the program, add found result to results
+      if (programIndex == program.size() - 1) {
+        results.add(aAttempt);
+        return;
+      }
+
+      // Recursive call for the next 3bit number.
+      findSelfOutputtingPrograms(program, aAttempt, programIndex + 1, registerB, registerC, results);
+    }
   }
 
   @Getter
@@ -50,7 +75,13 @@ public class Day17 {
       this.registerC = registerC;
     }
 
-    void performNextInstruction() {
+    void runProgram() {
+      while (getInstructionPointer() < program.size()) {
+        performNextInstruction();
+      }
+    }
+
+    private void performNextInstruction() {
       Short opcode = program.get(instructionPointer);
       Short literalOperand = program.get(instructionPointer + 1);
       switch (opcode) {
