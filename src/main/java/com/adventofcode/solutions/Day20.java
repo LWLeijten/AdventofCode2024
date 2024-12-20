@@ -56,7 +56,7 @@ public class Day20 {
           });
     }
 
-    // Part One (cheat with distance 2 only)
+    // Part One (cheat up to distance 2 only)
     HashMap<Integer, Integer> cheatOptionCounts = new HashMap<>();
     cheatWithMaxDistance(path, distances, 2, cheatOptionCounts);
     System.out.printf("Part one: %s%n",
@@ -67,9 +67,7 @@ public class Day20 {
 
     // Part Two (cheat with all distances op to 20)
     cheatOptionCounts = new HashMap<>();
-    for (int i = 0; i <= 20; i++) {
-      cheatWithMaxDistance(path, distances, i, cheatOptionCounts);
-    }
+    cheatWithMaxDistance(path, distances, 20, cheatOptionCounts);
     System.out.printf("Part two: %s%n",
             cheatOptionCounts.entrySet().stream()
                     .filter(es -> es.getKey() >= 100)
@@ -82,17 +80,16 @@ public class Day20 {
       HashMap<Tuple<Integer>, Integer> distances,
       int cheatDistance,
       HashMap<Integer, Integer> cheatOptionCounts) {
-    // O(n^2) could (probably) be optimized
     for (Tuple<Integer> pos : path) {
       int distance = distances.get(pos);
       path.stream()
           .filter(
               c ->
                   distances.get(c) > distance
-                      && TupleUtils.manhattanDistance(pos, c) == cheatDistance)
+                      && TupleUtils.manhattanDistance(pos, c) <= cheatDistance)
           .forEach(
               c -> {
-                int resultingCheat = distances.get(c) - distance - cheatDistance;
+                int resultingCheat = distances.get(c) - distance - TupleUtils.manhattanDistance(pos, c);
                 if (resultingCheat > 0) {
                   cheatOptionCounts.put(
                           resultingCheat, cheatOptionCounts.getOrDefault(resultingCheat, 0) + 1);
