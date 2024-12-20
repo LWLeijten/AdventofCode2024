@@ -34,20 +34,20 @@ public class Day20 {
 
     // Init the path and distances of all visited spaces
     HashMap<Tuple<Integer>, Integer> distances = new HashMap<>();
-    HashSet<Tuple<Integer>> visited = new HashSet<>();
+    HashSet<Tuple<Integer>> path = new HashSet<>();
     Queue<Tuple<Integer>> queue = new LinkedList<>();
     queue.offer(start);
     distances.put(start, 0);
     while (!queue.isEmpty()) {
       Tuple<Integer> pos = queue.remove();
-      visited.add(pos);
+      path.add(pos);
       List<Tuple<Integer>> neighbours =
           TupleUtils.getNeighbours(pos).stream()
               .filter(
                   nb ->
                       TupleUtils.coordinateIsInBounds(nb, width, height)
                           && !walls.contains(nb)
-                          && !visited.contains(nb))
+                          && !path.contains(nb))
               .toList();
       neighbours.forEach(
           nb -> {
@@ -56,39 +56,48 @@ public class Day20 {
           });
     }
 
-    // Cheat
+    // Part One (cheat with distance 2 only)
     HashMap<Integer, Integer> cheatOptionCounts = new HashMap<>();
-    for (Tuple<Integer> pos : visited) {
-      List<Tuple<Integer>> nbWalls =
-          TupleUtils.getNeighbours(pos).stream()
-              .filter(
-                  nb -> TupleUtils.coordinateIsInBounds(nb, width, height) && walls.contains(nb))
-              .toList();
-      for (Tuple<Integer> nbWall : nbWalls) {
-        Integer cheatDistance =
-            TupleUtils.getNeighbours(nbWall).stream()
-                    .filter(
-                        nb ->
-                            TupleUtils.coordinateIsInBounds(nb, width, height)
-                                && !walls.contains(nb)
-                                && !pos.equals(nb))
-                    .map(distances::get)
-                    .max(Integer::compareTo)
-                    .orElse(0) // Distance score of the space we cheat to
-                - distances.get(pos) // Distance score of current space
-                - 2; // The two steps we need to take to cheat
-
-        if (cheatDistance > 0) {
-          cheatOptionCounts.put(
-              cheatDistance, cheatOptionCounts.getOrDefault(cheatDistance, 0) + 1);
-        }
-      }
-    }
-
-    System.out.println(
+    cheatWithMaxDistance(path, distances, 2, cheatOptionCounts);
+    System.out.printf("Part one: %s%n",
         cheatOptionCounts.entrySet().stream()
             .filter(es -> es.getKey() >= 100)
             .mapToInt(Map.Entry::getValue)
             .sum());
+
+    // Part Two (cheat with all distances op to 20)
+    cheatOptionCounts = new HashMap<>();
+    for (int i = 0; i <= 20; i++) {
+      cheatWithMaxDistance(path, distances, i, cheatOptionCounts);
+    }
+    System.out.printf("Part two: %s%n",
+            cheatOptionCounts.entrySet().stream()
+                    .filter(es -> es.getKey() >= 100)
+                    .mapToInt(Map.Entry::getValue)
+                    .sum());
+  }
+
+  private void cheatWithMaxDistance(
+      HashSet<Tuple<Integer>> path,
+      HashMap<Tuple<Integer>, Integer> distances,
+      int cheatDistance,
+      HashMap<Integer, Integer> cheatOptionCounts) {
+    // O(n^2) could (probably) be optimized
+    for (Tuple<Integer> pos : path) {
+      int distance = distances.get(pos);
+      path.stream()
+          .filter(
+              c ->
+                  distances.get(c) > distance
+                      && TupleUtils.manhattanDistance(pos, c) == cheatDistance)
+          .forEach(
+              c -> {
+                int resultingCheat = distances.get(c) - distance - cheatDistance;
+                if (resultingCheat > 0) {
+                  cheatOptionCounts.put(
+                          resultingCheat, cheatOptionCounts.getOrDefault(resultingCheat, 0) + 1);
+                }
+              });
+    }
   }
 }

@@ -18,6 +18,9 @@ public class TupleUtils {
         && currentPoint.elem1() < width
         && currentPoint.elem2() >= 0
         && currentPoint.elem2() < height;
+  }
 
+  public static int manhattanDistance(Tuple<Integer> pointA, Tuple<Integer> pointB) {
+    return Math.abs(pointA.elem1() - pointB.elem1()) + Math.abs(pointA.elem2() - pointB.elem2());
   }
 }
