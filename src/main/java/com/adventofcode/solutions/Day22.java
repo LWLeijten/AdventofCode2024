@@ -5,6 +5,7 @@ import com.adventofcode.utils.InputReader;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Day22 {
   HashMap<Long, Long> secretNumberCache;
@@ -19,6 +20,7 @@ public class Day22 {
     List<List<Long>> priceList = new ArrayList<>();
     Set<List<Long>> changeSequences = new HashSet<>();
 
+    // Part one
     input.forEach(
         secret -> {
           List<Long> prices = new ArrayList<>();
@@ -47,25 +49,29 @@ public class Day22 {
           results.add(newResult);
         });
 
-    HashMap<List<Long>, Long> profitMap = new HashMap<>();
-    for (List<Long> sequence : changeSequences) {
-      Long profits = 0L;
-      for (List<Long> pl : priceList) {
-        for (int i = 4; i < pl.size(); i++) {
-          if (sequence.get(0).equals(pl.get(i - 3) - pl.get(i - 4))
-              && sequence.get(1).equals(pl.get(i - 2) - pl.get(i - 3))
-              && sequence.get(2).equals(pl.get(i - 1) - pl.get(i - 2))
-              && sequence.get(3).equals(pl.get(i) - pl.get(i - 1))) {
-            profits += pl.get(i);
-            break;
-          }
-        }
-      }
-      profitMap.put(sequence, profits);
-    }
+    // Part two
+    ConcurrentHashMap<List<Long>, Long> profitMap = new ConcurrentHashMap<>();
+    changeSequences.parallelStream()
+        .filter(sequence -> sequence.stream().reduce(Long::sum).get() > 0)
+        .forEach(
+            sequence -> {
+              Long profits = 0L;
+              for (List<Long> pl : priceList) {
+                for (int i = 4; i < pl.size(); i++) {
+                  if (sequence.get(0).equals(pl.get(i - 3) - pl.get(i - 4))
+                      && sequence.get(1).equals(pl.get(i - 2) - pl.get(i - 3))
+                      && sequence.get(2).equals(pl.get(i - 1) - pl.get(i - 2))
+                      && sequence.get(3).equals(pl.get(i) - pl.get(i - 1))) {
+                    profits += pl.get(i);
+                    break;
+                  }
+                }
+              }
+              profitMap.put(sequence, profits);
+            });
 
-    System.out.printf("Part one: %s%n",results.stream().reduce(Long::sum).get());
-    System.out.printf("Part two: %s%n",profitMap.values().stream().max(Long::compare).get());
+    System.out.printf("Part one: %s%n", results.stream().reduce(Long::sum).get());
+    System.out.printf("Part two: %s%n", profitMap.values().stream().max(Long::compare).get());
   }
 
   private Long calculateSecretNumber(Long secret) {
