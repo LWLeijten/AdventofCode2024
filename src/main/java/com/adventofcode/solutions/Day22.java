@@ -8,66 +8,54 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Day22 {
-  HashMap<Long, Long> secretNumberCache;
+  ConcurrentHashMap<Long, Long> secretNumberCache;
+  ConcurrentHashMap<List<Long>, Long> profitMap;
   Integer iterations = 2000;
 
   public Day22() throws FileNotFoundException, URISyntaxException {
     List<Long> input =
         InputReader.readInput("/day22.txt").stream().mapToLong(Long::parseLong).boxed().toList();
-    secretNumberCache = new HashMap<>();
-
+    secretNumberCache = new ConcurrentHashMap<>();
+    profitMap = new ConcurrentHashMap<>();
     List<Long> results = new ArrayList<>();
-    List<List<Long>> priceList = new ArrayList<>();
-    Set<List<Long>> changeSequences = new HashSet<>();
 
-    // Part one
-    input.forEach(
-        secret -> {
-          List<Long> prices = new ArrayList<>();
-          List<List<Long>> priceSequences = new ArrayList<>();
-          prices.add(getLastDigitOfLong(secret));
-          Long newResult = secret;
-          for (int j = 0; j < iterations; j++) {
-            newResult = calculateSecretNumber(newResult);
-            prices.add(getLastDigitOfLong(newResult));
-            if (prices.size() == 5) {
-              priceSequences.add(
-                  List.of(
-                      prices.get(1) - prices.get(0),
-                      prices.get(2) - prices.get(1),
-                      prices.get(3) - prices.get(2),
-                      prices.get(4) - prices.get(3)));
-            } else if (prices.size() > 5) {
-              List<Long> previousSequence = new ArrayList<>(priceSequences.getLast());
-              previousSequence.removeFirst();
-              previousSequence.add(prices.get(j + 1) - prices.get(j));
-              priceSequences.add(previousSequence);
-            }
-          }
-          changeSequences.addAll(priceSequences);
-          priceList.add(prices);
-          results.add(newResult);
-        });
-
-    // Part two
-    ConcurrentHashMap<List<Long>, Long> profitMap = new ConcurrentHashMap<>();
-    changeSequences.parallelStream()
-        .filter(sequence -> sequence.stream().reduce(Long::sum).get() > 0)
+    input.stream()
+        .parallel()
         .forEach(
-            sequence -> {
-              Long profits = 0L;
-              for (List<Long> pl : priceList) {
-                for (int i = 4; i < pl.size(); i++) {
-                  if (sequence.get(0).equals(pl.get(i - 3) - pl.get(i - 4))
-                      && sequence.get(1).equals(pl.get(i - 2) - pl.get(i - 3))
-                      && sequence.get(2).equals(pl.get(i - 1) - pl.get(i - 2))
-                      && sequence.get(3).equals(pl.get(i) - pl.get(i - 1))) {
-                    profits += pl.get(i);
-                    break;
+            secret -> {
+              HashSet<List<Long>> seenSequences = new HashSet<>();
+              List<Long> prices = new ArrayList<>();
+              List<List<Long>> priceSequences = new ArrayList<>();
+              prices.add(getLastDigitOfLong(secret));
+              for (int j = 0; j < iterations; j++) {
+                secret = calculateSecretNumber(secret);
+                prices.add(getLastDigitOfLong(secret));
+                // The first 4 sequence of deltas we can create
+                if (prices.size() == 5) {
+                  List<Long> sequence =
+                      List.of(
+                          prices.get(1) - prices.get(0),
+                          prices.get(2) - prices.get(1),
+                          prices.get(3) - prices.get(2),
+                          prices.get(4) - prices.get(3));
+                  priceSequences.add(sequence);
+                  seenSequences.add(sequence);
+                  profitMap.merge(sequence, prices.get(4), Long::sum);
+                }
+                // All further deltas, which we can base on the previous delta with 1 number
+                // replaced
+                else if (prices.size() > 5) {
+                  List<Long> previousSequence = new ArrayList<>(priceSequences.getLast());
+                  previousSequence.removeFirst();
+                  previousSequence.add(prices.get(j + 1) - prices.get(j));
+                  priceSequences.add(previousSequence);
+                  if (!seenSequences.contains(previousSequence)) {
+                    profitMap.merge(previousSequence, prices.get(j + 1), Long::sum);
+                    seenSequences.add(previousSequence);
                   }
                 }
               }
-              profitMap.put(sequence, profits);
+              results.add(secret);
             });
 
     System.out.printf("Part one: %s%n", results.stream().reduce(Long::sum).get());
