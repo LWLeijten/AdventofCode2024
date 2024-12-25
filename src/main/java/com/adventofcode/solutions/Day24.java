@@ -85,37 +85,43 @@ public class Day24 {
     // wmr:(x02 XOR y02) -> z02
     // Output always is a combination of that indexes XOR (e.g. x02 XOR yo2 -> z02) and the carry of
     // everything before
-    // Expand all the logic gates, print them and spot the pattern i guess
-
-    //    for (final Gate gate :
-    //        gates.stream()
-    //            .filter(g -> g.wireOutput.startsWith("z"))
-    //            .sorted(Comparator.comparing(Gate::getWireOutput))
-    //            .toList()) {
-    //      System.out.printf("%s -> %s%n", expandGate(gate), gate.wireOutput);
-    //    }
+    // Expand all the logic gates, print them and spot the pattern
     //
+    // The chain of carry bits alternates between GREEN and ORANGE. (AND/OR)/
+    // The input pairs X00 Y00 always have a AND and a XOR.
+    // The outputs (Zxx) always are formed by XOR, based on ORANGE(OR) carry bit and the RED(XOR) of the inputs.
 
-    //    for (final Gate gate: gates) {
-    //      System.out.println("node " + gate.wireOutput);
-    //    }
+    System.out.println("Part two: Done by visualizing the graphviz and finding mistakes by eye");
+    //printAsGraphviz(gates, setWires);
+    // https://github.com/LWLeijten/AdventofCode2024/blob/main/src/main/resources/day24
+  }
 
+  private void printAsGraphviz(List<Gate> gates, List<Wire> wires) {
+    System.out.println("digraph G {");
     // Colour x, y and z's
-    //    for (Wire wire : setWires){
-    //      if (wire.label.startsWith("x")) {
-    //        System.out.println("%s [color=\"lightblue\", style=\"filled\"]".formatted(wire.label));
-    //      } else if (wire.label.startsWith("y")) {
-    //        System.out.println("%s [color=\"lightgreen\", style=\"filled\"]".formatted(wire.label));
-    //      } else if (wire.label.startsWith("z")) {
-    //        System.out.println("%s [color=\"pink\", style=\"filled\"]".formatted(wire.label));
-    //      }
-    //    }
+    for (Wire wire : wires) {
+      if (wire.label.startsWith("x")) {
+        System.out.println("%s [color=\"lightblue\", style=\"filled\"]".formatted(wire.label));
+      } else if (wire.label.startsWith("y")) {
+        System.out.println("%s [color=\"lightgreen\", style=\"filled\"]".formatted(wire.label));
+      } else if (wire.label.startsWith("z")) {
+        System.out.println("%s [color=\"pink\", style=\"filled\"]".formatted(wire.label));
+      }
+    }
 
     // Print all edges and nodes
-    //    for (Gate gate : gates) {
-    //      System.out.printf("%s -> %s%n", gate.wireA, gate.wireOutput);
-    //      System.out.printf("%s -> %s%n", gate.wireB, gate.wireOutput);
-    //    }
+    for (Gate gate : gates) {
+      String color = "black";
+      switch (gate.operand) {
+        case AND -> color = "green";
+        case OR -> color = "orange";
+        case XOR -> color = "red";
+      }
+
+      System.out.printf("%s -> %s [color=\"%s\"]%n", gate.wireA, gate.wireOutput, color);
+      System.out.printf("%s -> %s [color=\"%s\"]%n", gate.wireB, gate.wireOutput, color);
+    }
+    System.out.println("}");
   }
 
   private String expandGate(Gate gate) {
