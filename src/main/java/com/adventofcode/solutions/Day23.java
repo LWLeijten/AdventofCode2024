@@ -18,35 +18,39 @@ public class Day23 {
 
     LanParty lanParty = new LanParty();
     for (String line : input) {
-      String pcA = line.split("-")[0];
-      String pcB = line.split("-")[1];
+      String pcNameA = line.split("-")[0];
+      String pcNameB = line.split("-")[1];
 
-      Optional<Computer> pcAComputer = lanParty.getComputer(pcA);
-      Optional<Computer> pcBComputer = lanParty.getComputer(pcB);
+      Optional<Computer> optionalPcA = lanParty.getComputer(pcNameA);
+      Optional<Computer> optionalPcB = lanParty.getComputer(pcNameB);
 
-      if (pcAComputer.isPresent() && pcBComputer.isPresent()) {
-        pcAComputer.get().addConnection(pcBComputer.get());
-        pcBComputer.get().addConnection(pcAComputer.get());
-      } else if (pcAComputer.isPresent()) {
-        Computer b = new Computer(pcB);
-        pcAComputer.get().addConnection(b);
-        b.addConnection(pcAComputer.get());
-        lanParty.computers.add(b);
-      } else if (pcBComputer.isPresent()) {
-        Computer a = new Computer(pcA);
-        pcBComputer.get().addConnection(a);
-        a.addConnection(pcBComputer.get());
-        lanParty.computers.add(a);
+      if (optionalPcA.isPresent() && optionalPcB.isPresent()) {
+        optionalPcA.get().addConnection(optionalPcB.get());
+        optionalPcB.get().addConnection(optionalPcA.get());
+      } else if (optionalPcA.isPresent()) {
+        Computer pcB = new Computer(pcNameB);
+        optionalPcA.get().addConnection(pcB);
+        pcB.addConnection(optionalPcA.get());
+        lanParty.computers.add(pcB);
+      } else if (optionalPcB.isPresent()) {
+        Computer pcA = new Computer(pcNameA);
+        optionalPcB.get().addConnection(pcA);
+        pcA.addConnection(optionalPcB.get());
+        lanParty.computers.add(pcA);
       } else {
-        Computer a = new Computer(pcA);
-        Computer b = new Computer(pcB);
-        a.addConnection(b);
-        b.addConnection(a);
-        lanParty.computers.addAll(List.of(a, b));
+        Computer pcA = new Computer(pcNameA);
+        Computer pcB = new Computer(pcNameB);
+        pcA.addConnection(pcB);
+        pcB.addConnection(pcA);
+        lanParty.computers.addAll(List.of(pcA, pcB));
       }
     }
 
     System.out.printf("Part one: %s%n", lanParty.getInterconnectedComputers().size());
+    System.out.printf(
+        "Part two: %s%n",
+        String.join(
+            ",", lanParty.getLargestNetwork().stream().map(Computer::getName).sorted().toList()));
   }
 
   @Getter
@@ -64,20 +68,71 @@ public class Day23 {
 
     public Set<List<Computer>> getInterconnectedComputers() {
       Set<List<Computer>> interconnectedComputers = new HashSet<>();
-      computers.stream().filter(c -> c.getName().startsWith("t")).forEach(c -> {
-        List<Computer> connections = c.getConnections();
-        for (int i = 0; i < connections.size(); i++) {
-          Computer computer = connections.get(i);
-          List<Computer> mutuals = connections.subList(i + 1, connections.size()).stream()
-              .filter(cc -> cc.getConnections().contains(computer)).toList();
-          for (Computer mutual : mutuals) {
-            List<Computer> ccc = new ArrayList<>(List.of(c, computer, mutual));
-            ccc.sort(Comparator.comparing(Computer::getName));
-            interconnectedComputers.add(ccc);
+      computers.stream()
+          .filter(c -> c.getName().startsWith("t"))
+          .forEach(
+              c -> {
+                List<Computer> connections = c.getConnections();
+                for (int i = 0; i < connections.size(); i++) {
+                  Computer computer = connections.get(i);
+                  List<Computer> mutuals =
+                      connections.subList(i + 1, connections.size()).stream()
+                          .filter(cc -> cc.getConnections().contains(computer))
+                          .toList();
+                  for (Computer mutual : mutuals) {
+                    List<Computer> ccc = new ArrayList<>(List.of(c, computer, mutual));
+                    ccc.sort(Comparator.comparing(Computer::getName));
+                    interconnectedComputers.add(ccc);
+                  }
+                }
+              });
+      return interconnectedComputers;
+    }
+
+    public List<Computer> getLargestNetwork() {
+      List<Computer> largestNetwork = List.of();
+      for (Computer computer : computers) {
+        List<Computer> largestComputerNetwork = getLargestNetworkIncludingComputer(computer);
+        if (largestComputerNetwork.size() > largestNetwork.size()) {
+          largestNetwork = largestComputerNetwork;
+        }
+      }
+      return largestNetwork;
+    }
+
+    private List<Computer> getLargestNetworkIncludingComputer(Computer computer) {
+      List<List<Computer>> subsets = new ArrayList<>();
+      List<Computer> startSubset = new ArrayList<>();
+      getSubsets(computer.getConnections(), 0, subsets, startSubset);
+      subsets.sort((Comparator.comparingInt(List::size)));
+      for (List<Computer> subset : subsets.reversed()) {
+        boolean valid = true;
+        for (int i = 0; i < subset.size(); i++) {
+          HashSet<Computer> connections = new HashSet<>(subset.get(i).connections);
+          List<Computer> sublist = subset.subList(i + 1, subset.size());
+          if (!connections.containsAll(sublist)) {
+            valid = false;
+            break;
           }
         }
-      });
-      return interconnectedComputers;
+        if (valid) {
+          subset.add(computer);
+          return subset;
+        }
+      }
+      return List.of();
+    }
+
+    private void getSubsets(
+        List<Computer> computers, int i, List<List<Computer>> subsets, List<Computer> subset) {
+      if (i == computers.size() - 1) {
+        subsets.add(new ArrayList<>(subset));
+        return;
+      }
+      subset.add(computers.get(i));
+      getSubsets(computers, i + 1, subsets, subset);
+      subset.removeLast();
+      getSubsets(computers, i + 1, subsets, subset);
     }
   }
 
